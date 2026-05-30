@@ -5,343 +5,154 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Calorie Calculator</title>
 
-<!-- Google Search Console Verification -->
 <meta name="google-site-verification" content="Nm3RVs0oPIOKXxBzIegKvGQlDoilSoAxvTxujh0ebrk" />
+<meta name="description" content="Free calorie calculator to estimate TDEE, BMR, and macros for weight loss, maintenance, and muscle gain." />
 
 <style>
 :root {
   --color-background-primary: #0b1220;
   --color-background-secondary: #111c2e;
-
   --color-text-primary: #f8fafc;
   --color-text-secondary: #cbd5e1;
   --color-text-tertiary: #94a3b8;
-
-  --color-border-primary: #243244;
-  --color-border-tertiary: #1a2433;
-
   --accent: #60a5fa;
-
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
-  --shadow-md: 0 6px 18px rgba(0,0,0,0.35);
-
   --border-radius-md: 12px;
-  --border-radius-lg: 16px;
-
-  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  --font-sans: ui-sans-serif, system-ui;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
 
 body {
   font-family: var(--font-sans);
-  background: radial-gradient(1200px 600px at 20% 0%, #111c2e 0%, #0b1220 60%, #070b14 100%);
+  background: #0b1220;
   color: var(--color-text-primary);
 }
 
-.wrap {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 1.5rem;
+nav {
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  padding:15px;
+  border-bottom:1px solid #1a2433;
 }
 
-.title {
-  font-size: 22px;
-  margin-bottom: 4px;
+nav button {
+  background:none;
+  border:none;
+  color:var(--color-text-secondary);
+  cursor:pointer;
 }
 
-.subtitle {
-  font-size: 14px;
-  color: var(--color-text-secondary);
-  margin-bottom: 1.5rem;
+nav button:hover {
+  color:white;
 }
 
-.grid2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
+.page { display:none; padding:20px; max-width:700px; margin:auto; }
+.page.active { display:block; }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-label {
-  font-size: 13px;
-  color: var(--color-text-secondary);
-}
-
+/* calculator styles */
 input, select {
-  background: var(--color-background-secondary);
-  border: 1px solid var(--color-border-tertiary);
-  border-radius: var(--border-radius-md);
-  padding: 8px 10px;
-  color: var(--color-text-primary);
-  outline: none;
+  width:100%;
+  padding:8px;
+  margin-top:5px;
+  border-radius:8px;
+  border:1px solid #1a2433;
+  background:#111c2e;
+  color:white;
 }
 
-input:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(96,165,250,0.15);
+button.calc {
+  margin-top:10px;
+  width:100%;
+  padding:10px;
+  background:linear-gradient(135deg,#60a5fa,#3b82f6);
+  border:none;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
 }
 
-.toggle-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
+.card {
+  background:#111c2e;
+  padding:15px;
+  border-radius:10px;
+  margin-top:10px;
 }
 
-.tog {
-  flex: 1;
-  padding: 8px;
-  background: var(--color-background-secondary);
-  border: 1px solid var(--color-border-tertiary);
-  border-radius: var(--border-radius-md);
-  text-align: center;
-  cursor: pointer;
-  color: var(--color-text-secondary);
-}
-
-.tog.active {
-  border-color: var(--accent);
-  color: var(--color-text-primary);
-}
-
-.calc-btn {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: var(--border-radius-md);
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  color: white;
-  cursor: pointer;
-  margin-top: 8px;
-  transition: 0.15s;
-  box-shadow: var(--shadow-sm);
-}
-
-.calc-btn:hover {
-  transform: translateY(-1px);
-}
-
-.results {
-  margin-top: 1.5rem;
-  display: none;
-}
-
-.results.show {
-  display: block;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 1.5rem;
-}
-
-.card, .macro-card {
-  background: var(--color-background-secondary);
-  border: 1px solid var(--color-border-tertiary);
-  border-radius: var(--border-radius-md);
-  padding: 1rem;
-  box-shadow: var(--shadow-sm);
-  transition: 0.15s;
-}
-
-.card:hover, .macro-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.card-label {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.card-val {
-  font-size: 22px;
-  margin-top: 6px;
-}
-
-.card-sub {
-  font-size: 11px;
-  color: var(--color-text-tertiary);
-}
-
-.macro-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-
-.macro-name {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  margin-bottom: 8px;
-}
-
-.macro-g {
-  font-size: 20px;
-}
-
-.macro-kcal {
-  font-size: 11px;
-  color: var(--color-text-tertiary);
-}
-
-.bar-wrap {
-  height: 6px;
-  background: var(--color-background-secondary);
-  border-radius: 3px;
-  margin: 1.5rem 0;
-  display: flex;
-  overflow: hidden;
-}
-
-.bar-seg {
-  height: 100%;
-}
-
-.note {
-  font-size: 12px;
-  color: var(--color-text-tertiary);
-  margin-top: 1rem;
-}
 </style>
 </head>
 
 <body>
 
-<div class="wrap">
+<nav>
+  <button onclick="showPage('calc')">Calculator</button>
+  <button onclick="showPage('about')">About</button>
+  <button onclick="showPage('privacy')">Privacy Policy</button>
+</nav>
 
-  <p class="title">Calorie calculator</p>
-  <p class="subtitle">Get your daily calorie needs and macros.</p>
+<!-- CALCULATOR PAGE -->
+<div id="calc" class="page active">
 
-  <div class="toggle-row">
-    <div class="tog active" onclick="setSex('male',this)">Male</div>
-    <div class="tog" onclick="setSex('female',this)">Female</div>
-  </div>
+  <h1>Calorie Calculator</h1>
 
-  <div class="grid2">
-    <div class="field">
-      <label>Age</label>
-      <input type="number" id="age" value="30">
-    </div>
-    <div class="field">
-      <label>Weight</label>
-      <input type="number" id="weight" value="75">
-    </div>
-    <div class="field">
-      <label>Height</label>
-      <input type="number" id="height" value="175">
-    </div>
-    <div class="field">
-      <label>Activity</label>
-      <select id="activity">
-        <option value="1.2">Sedentary</option>
-        <option value="1.375">Light</option>
-        <option value="1.55" selected>Moderate</option>
-        <option value="1.725">Very active</option>
-      </select>
-    </div>
-  </div>
+  <input id="age" placeholder="Age">
+  <input id="weight" placeholder="Weight (kg)">
+  <input id="height" placeholder="Height (cm)">
 
-  <div class="field">
-    <label>Goal</label>
-    <select id="goal">
-      <option value="maintain">Maintain</option>
-      <option value="lose">Lose</option>
-      <option value="gain">Gain</option>
-    </select>
-  </div>
+  <select id="activity">
+    <option value="1.2">Sedentary</option>
+    <option value="1.55">Moderate</option>
+    <option value="1.725">Very active</option>
+  </select>
 
-  <button class="calc-btn" onclick="calculate()">Calculate</button>
+  <select id="goal">
+    <option value="0">Maintain</option>
+    <option value="-500">Lose</option>
+    <option value="300">Gain</option>
+  </select>
 
-  <div class="results" id="results">
+  <button class="calc" onclick="calc()">Calculate</button>
 
-    <h2 id="main-cal">—</h2>
+  <div id="result"></div>
+</div>
 
-    <div class="cards">
-      <div class="card">
-        <div class="card-label">BMR</div>
-        <div class="card-val" id="bmr">—</div>
-      </div>
+<!-- ABOUT -->
+<div id="about" class="page">
+  <h1>About</h1>
+  <p>This tool helps you calculate daily calories, TDEE, and macros using scientific formulas.</p>
+</div>
 
-      <div class="card">
-        <div class="card-label">TDEE</div>
-        <div class="card-val" id="tdee">—</div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Delta</div>
-        <div class="card-val" id="delta">—</div>
-      </div>
-    </div>
-
-    <div class="macro-row">
-      <div class="macro-card">
-        <div class="macro-name">Protein</div>
-        <div class="macro-g" id="prot">—</div>
-      </div>
-
-      <div class="macro-card">
-        <div class="macro-name">Carbs</div>
-        <div class="macro-g" id="carb">—</div>
-      </div>
-
-      <div class="macro-card">
-        <div class="macro-name">Fat</div>
-        <div class="macro-g" id="fat">—</div>
-      </div>
-    </div>
-
-    <p class="note" id="note"></p>
-
-  </div>
+<!-- PRIVACY -->
+<div id="privacy" class="page">
+  <h1>Privacy Policy</h1>
+  <p>This website does not collect personal data. All calculations are done locally in your browser.</p>
 </div>
 
 <script>
-let sex = "male";
-
-function setSex(s, el){
-  sex = s;
-  document.querySelectorAll(".tog").forEach(t=>t.classList.remove("active"));
-  el.classList.add("active");
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function calculate(){
+function calc(){
   const age = +document.getElementById("age").value;
   const weight = +document.getElementById("weight").value;
   const height = +document.getElementById("height").value;
   const activity = +document.getElementById("activity").value;
-  const goal = document.getElementById("goal").value;
+  const goal = +document.getElementById("goal").value;
 
-  let bmr = sex === "male"
-    ? 10*weight + 6.25*height - 5*age + 5
-    : 10*weight + 6.25*height - 5*age - 161;
+  const bmr = 10*weight + 6.25*height - 5*age + 5;
+  const tdee = bmr * activity;
+  const target = tdee + goal;
 
-  let tdee = bmr * activity;
-
-  let delta = goal === "lose" ? -500 : goal === "gain" ? 300 : 0;
-  let target = tdee + delta;
-
-  document.getElementById("main-cal").textContent = Math.round(target) + " kcal";
-  document.getElementById("bmr").textContent = Math.round(bmr);
-  document.getElementById("tdee").textContent = Math.round(tdee);
-  document.getElementById("delta").textContent = delta;
-
-  document.getElementById("prot").textContent = Math.round(target*0.3/4) + "g";
-  document.getElementById("carb").textContent = Math.round(target*0.4/4) + "g";
-  document.getElementById("fat").textContent = Math.round(target*0.3/9) + "g";
-
-  document.getElementById("note").textContent =
-    "Estimates only — adjust based on real progress.";
-
-  document.getElementById("results").classList.add("show");
+  document.getElementById("result").innerHTML = `
+    <div class="card">
+      <h3>Result</h3>
+      <p>Calories: ${Math.round(target)}</p>
+      <p>BMR: ${Math.round(bmr)}</p>
+      <p>TDEE: ${Math.round(tdee)}</p>
+    </div>
+  `;
 }
 </script>
 
