@@ -1,121 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Calorie Calculator</title>
 
 <style>
+:root {
+  --color-background-primary: #0b1220;
+  --color-background-secondary: #111c2e;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-tertiary: #94a3b8;
+
+  --color-border-primary: #243244;
+  --color-border-tertiary: #1a2433;
+
+  --accent: #60a5fa;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-md: 0 6px 18px rgba(0,0,0,0.35);
+
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  color: black;
-  min-height: 100vh;
+  font-family: var(--font-sans);
+  background: radial-gradient(1200px 600px at 20% 0%, #111c2e 0%, #0b1220 60%, #070b14 100%);
+  color: var(--color-text-primary);
+}
+
+.wrap {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.title {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.field {
   display: flex;
-  justify-content: center;
-  align-items: center;
-
-  /* motivational background */
-  background: url("https://images.unsplash.com/photo-1506784365847-bbad939e9335") no-repeat center center/cover;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.75);
-}
-
-.container {
-  position: relative;
-  z-index: 2;
-  width: 90%;
-  max-width: 700px;
-  background: white;
-  padding: 25px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  text-align: center;
-}
-
-h2 {
-  margin-bottom: 5px;
-}
-
-p {
-  color: #444;
-  margin-bottom: 20px;
+label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
 }
 
 input, select {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 8px 10px;
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.15);
+}
+
+.toggle-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tog {
+  flex: 1;
+  padding: 8px;
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  text-align: center;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+}
+
+.tog.active {
+  border-color: var(--accent);
+  color: var(--color-text-primary);
+}
+
+.calc-btn {
   width: 100%;
   padding: 10px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background: black;
-  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  color: white;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 8px;
+  transition: 0.15s;
+  box-shadow: var(--shadow-sm);
 }
 
-button:hover {
-  opacity: 0.8;
+.calc-btn:hover {
+  transform: translateY(-1px);
 }
 
-.result {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: bold;
+.results {
+  margin-top: 1.5rem;
+  display: none;
+}
+
+.results.show {
+  display: block;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.card, .macro-card {
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: 0.15s;
+}
+
+.card:hover, .macro-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.card-val {
+  font-size: 22px;
+  margin-top: 6px;
+}
+
+.card-sub {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.macro-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.macro-name {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.macro-g {
+  font-size: 20px;
+}
+
+.macro-kcal {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.bar-wrap {
+  height: 6px;
+  background: var(--color-background-secondary);
+  border-radius: 3px;
+  margin: 1.5rem 0;
+  display: flex;
+  overflow: hidden;
+}
+
+.bar-seg {
+  height: 100%;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-top: 1rem;
 }
 </style>
 </head>
 
 <body>
 
-<div class="overlay"></div>
+<div class="wrap">
 
-<div class="container">
-  <h2>🔥 Calorie Calculator</h2>
-  <p>Stay consistent. Build your dream body.</p>
+  <p class="title">Calorie calculator</p>
+  <p class="subtitle">Get your daily calorie needs and macros.</p>
 
-  <input id="weight" placeholder="Weight (kg)">
-  <input id="height" placeholder="Height (cm)">
-  <input id="age" placeholder="Age">
+  <div class="toggle-row">
+    <div class="tog active" onclick="setSex('male',this)">Male</div>
+    <div class="tog" onclick="setSex('female',this)">Female</div>
+  </div>
 
-  <select id="activity">
-    <option value="1.2">Sedentary</option>
-    <option value="1.375">Lightly active</option>
-    <option value="1.55" selected>Moderate</option>
-    <option value="1.725">Very active</option>
-  </select>
+  <div class="grid2">
+    <div class="field">
+      <label>Age</label>
+      <input type="number" id="age" value="30">
+    </div>
+    <div class="field">
+      <label>Weight</label>
+      <input type="number" id="weight" value="75">
+    </div>
+    <div class="field">
+      <label>Height</label>
+      <input type="number" id="height" value="175">
+    </div>
+    <div class="field">
+      <label>Activity</label>
+      <select id="activity">
+        <option value="1.2">Sedentary</option>
+        <option value="1.375">Light</option>
+        <option value="1.55" selected>Moderate</option>
+        <option value="1.725">Very active</option>
+      </select>
+    </div>
+  </div>
 
-  <button onclick="calc()">Calculate</button>
+  <div class="field">
+    <label>Goal</label>
+    <select id="goal">
+      <option value="maintain">Maintain</option>
+      <option value="lose">Lose</option>
+      <option value="gain">Gain</option>
+    </select>
+  </div>
 
-  <div class="result" id="result"></div>
+  <button class="calc-btn" onclick="calculate()">Calculate</button>
+
+  <div class="results" id="results">
+
+    <h2 id="main-cal">—</h2>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">BMR</div>
+        <div class="card-val" id="bmr">—</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">TDEE</div>
+        <div class="card-val" id="tdee">—</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Delta</div>
+        <div class="card-val" id="delta">—</div>
+      </div>
+    </div>
+
+    <div class="macro-row">
+      <div class="macro-card">
+        <div class="macro-name">Protein</div>
+        <div class="macro-g" id="prot">—</div>
+      </div>
+
+      <div class="macro-card">
+        <div class="macro-name">Carbs</div>
+        <div class="macro-g" id="carb">—</div>
+      </div>
+
+      <div class="macro-card">
+        <div class="macro-name">Fat</div>
+        <div class="macro-g" id="fat">—</div>
+      </div>
+    </div>
+
+    <p class="note" id="note"></p>
+
+  </div>
 </div>
 
 <script>
-function calc() {
-  let w = document.getElementById("weight").value;
-  let h = document.getElementById("height").value;
-  let a = document.getElementById("age").value;
-  let activity = document.getElementById("activity").value;
+let sex = "male";
 
-  let bmr = 10*w + 6.25*h - 5*a + 5;
+function setSex(s, el){
+  sex = s;
+  document.querySelectorAll(".tog").forEach(t=>t.classList.remove("active"));
+  el.classList.add("active");
+}
+
+function calculate(){
+  const age = +document.getElementById("age").value;
+  const weight = +document.getElementById("weight").value;
+  const height = +document.getElementById("height").value;
+  const activity = +document.getElementById("activity").value;
+  const goal = document.getElementById("goal").value;
+
+  let bmr = sex === "male"
+    ? 10*weight + 6.25*height - 5*age + 5
+    : 10*weight + 6.25*height - 5*age - 161;
+
   let tdee = bmr * activity;
 
-  document.getElementById("result").innerHTML =
-    "🔥 Your daily calories: " + Math.round(tdee) + " kcal";
+  let delta = goal === "lose" ? -500 : goal === "gain" ? 300 : 0;
+  let target = tdee + delta;
+
+  document.getElementById("main-cal").textContent = Math.round(target) + " kcal";
+  document.getElementById("bmr").textContent = Math.round(bmr);
+  document.getElementById("tdee").textContent = Math.round(tdee);
+  document.getElementById("delta").textContent = delta;
+
+  document.getElementById("prot").textContent = Math.round(target*0.3/4) + "g";
+  document.getElementById("carb").textContent = Math.round(target*0.4/4) + "g";
+  document.getElementById("fat").textContent = Math.round(target*0.3/9) + "g";
+
+  document.getElementById("note").textContent =
+    "Estimates only — adjust based on real progress.";
+
+  document.getElementById("results").classList.add("show");
 }
 </script>
 
