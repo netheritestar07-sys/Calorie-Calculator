@@ -50,7 +50,6 @@ nav button:hover {
 .page { display:none; padding:20px; max-width:700px; margin:auto; }
 .page.active { display:block; }
 
-/* calculator styles */
 input, select {
   width:100%;
   padding:8px;
@@ -77,6 +76,25 @@ button.calc {
   padding:15px;
   border-radius:10px;
   margin-top:10px;
+}
+
+/* 🔥 Gumroad box */
+.gumroad {
+  margin-top:20px;
+  padding:15px;
+  background:#111c2e;
+  border:1px solid #1a2433;
+  border-radius:12px;
+}
+
+.gumroad a {
+  color:#60a5fa;
+  font-weight:bold;
+  text-decoration:none;
+}
+
+.gumroad a:hover {
+  text-decoration:underline;
 }
 
 </style>
@@ -114,6 +132,18 @@ button.calc {
   <button class="calc" onclick="calc()">Calculate</button>
 
   <div id="result"></div>
+
+  <!-- 🔥 YOUR GUMROAD PRODUCT (added cleanly) -->
+  <div class="gumroad">
+    <h3>🔥 Bonus Fitness Guide</h3>
+    <p>
+      I also made a full fitness guide to help you lose fat and build muscle faster.
+    </p>
+    <a href="https://netheritestar.gumroad.com/l/nurkys" target="_blank">
+      👉 Get it here
+    </a>
+  </div>
+
 </div>
 
 <!-- ABOUT -->
