@@ -1,221 +1,955 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Calorie Calculator</title>
-
-<meta name="google-site-verification" content="Nm3RVs0oPIOKXxBzIegKvGQlDoilSoAxvTxujh0ebrk" />
-
+<title>Calorie Calculator — Free BMR, TDEE & Macro Calculator</title>
+<meta name="description" content="Free calorie calculator. Calculate your daily calorie needs, BMR, TDEE and macro split instantly for weight loss, muscle gain and maintenance."/>
+<meta name="google-site-verification" content="Nm3RVs0oPIOKXxBzIegKvGQlDoilSoAxvTxujh0ebrk"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#0b1220;
-  --card:#111c2e;
-  --border:#1f2a3a;
-  --text:#ffffff;
-  --muted:#aab4c5;
-  --accent:#60a5fa;
+  --bg:#070d18;
+  --surface:#0d1526;
+  --card:#111e33;
+  --card2:#152038;
+  --border:#1e2d45;
+  --text:#f0f4ff;
+  --muted:#7a90b0;
+  --faint:#2a3f5f;
+  --accent:#38bdf8;
+  --accent2:#818cf8;
+  --green:#34d399;
+  --orange:#fb923c;
+  --pink:#f472b6;
+  --yellow:#fbbf24;
+  --red:#f87171;
 }
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
 body{
-  font-family:system-ui, Arial;
+  font-family:'DM Sans',sans-serif;
   background:var(--bg);
   color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* BG GLOW */
+body::before{
+  content:'';
+  position:fixed;
+  top:-200px;left:50%;
+  transform:translateX(-50%);
+  width:900px;height:600px;
+  background:radial-gradient(ellipse at center,rgba(56,189,248,.07) 0%,transparent 70%);
+  pointer-events:none;
+  z-index:0;
 }
 
 /* NAV */
 nav{
-  display:flex;
-  justify-content:center;
-  gap:15px;
-  padding:15px;
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;
+  background:rgba(7,13,24,.85);
+  backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);
 }
-
-nav button{
-  background:none;
-  border:none;
-  color:var(--muted);
-  cursor:pointer;
+.nav-logo{
+  font-family:'Syne',sans-serif;
+  font-size:20px;font-weight:800;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.nav-links{display:flex;gap:6px;}
+.nav-links button{
+  background:none;border:none;
+  color:var(--muted);cursor:pointer;
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;padding:8px 14px;
+  border-radius:8px;transition:all .2s;
+}
+.nav-links button:hover,.nav-links button.active{
+  color:var(--text);background:var(--card);
 }
 
-nav button:hover{
-  color:white;
+/* PAGES */
+.page{display:none;}
+.page.active{display:block;}
+
+/* HERO */
+.hero{
+  text-align:center;
+  padding:60px 20px 20px;
+  position:relative;z-index:1;
+}
+.hero h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(32px,6vw,58px);
+  font-weight:800;
+  line-height:1.1;
+  background:linear-gradient(135deg,#f0f4ff 30%,var(--accent) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:14px;
+}
+.hero p{
+  color:var(--muted);font-size:16px;
+  max-width:500px;margin:0 auto 30px;
+  line-height:1.7;
 }
 
-/* LAYOUT */
-.container{
-  display:flex;
+/* MAIN GRID */
+.main-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:20px;
-  max-width:900px;
-  margin:auto;
-  padding:20px;
-  flex-wrap:wrap;
+  max-width:960px;
+  margin:0 auto;
+  padding:0 20px 40px;
+  position:relative;z-index:1;
+}
+@media(max-width:680px){
+  .main-grid{grid-template-columns:1fr;}
 }
 
-.left, .right{
-  flex:1;
-  min-width:280px;
+/* CARDS */
+.calc-card,.food-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+}
+.calc-card h2,.food-card h2{
+  font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:700;
+  margin-bottom:18px;
+  display:flex;align-items:center;gap:8px;
 }
 
 /* INPUTS */
-input,select{
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:var(--card);
-  color:white;
-}
-
-button.calc{
-  width:100%;
-  margin-top:12px;
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:linear-gradient(135deg,#60a5fa,#3b82f6);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* RESULT CARD */
-.result{
-  margin-top:15px;
-  padding:15px;
-  border-radius:12px;
-  background:var(--card);
-  border:1px solid var(--border);
-}
-
-/* FOOD PANEL */
-.right{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:15px;
-}
-
-.food{
+.field{margin-bottom:14px;}
+.field label{
+  display:block;
+  font-size:12px;font-weight:500;
   color:var(--muted);
-  font-size:13px;
-  margin:4px 0;
+  text-transform:uppercase;letter-spacing:.07em;
+  margin-bottom:6px;
+}
+.field input,.field select{
+  width:100%;padding:11px 14px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;
+  transition:border-color .2s;
+  outline:none;
+}
+.field input:focus,.field select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(56,189,248,.1);
+}
+.field select option{background:#111e33;}
+
+/* SEX TOGGLE */
+.sex-toggle{display:flex;gap:8px;margin-bottom:14px;}
+.sex-btn{
+  flex:1;padding:10px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--muted);
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;cursor:pointer;
+  transition:all .2s;
+}
+.sex-btn.active{
+  background:rgba(56,189,248,.12);
+  border-color:var(--accent);
+  color:var(--accent);
+  font-weight:500;
 }
 
-h2,h3{
+/* CALC BUTTON */
+.calc-btn{
+  width:100%;margin-top:4px;
+  padding:13px;border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  color:white;
+  font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:700;
+  cursor:pointer;
+  transition:opacity .2s, transform .15s;
+  letter-spacing:.02em;
+}
+.calc-btn:hover{opacity:.9;transform:translateY(-1px);}
+.calc-btn:active{transform:translateY(0);}
+
+/* RESULT */
+.result-box{
+  margin-top:18px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
+  display:none;
+  animation:fadeUp .3s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.result-box.show{display:block;}
+.result-main{
+  text-align:center;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:14px;
+}
+.result-kcal{
+  font-family:'Syne',sans-serif;
+  font-size:44px;font-weight:800;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.result-label{font-size:13px;color:var(--muted);}
+.result-row{
+  display:flex;justify-content:space-between;
+  font-size:13px;padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.result-row:last-child{border-bottom:none;}
+.result-row span{color:var(--muted);}
+.result-row b{color:var(--text);}
+
+/* MACRO BARS */
+.macro-section{margin-top:14px;}
+.macro-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
+.macro-item{margin-bottom:10px;}
+.macro-header{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;}
+.macro-name{color:var(--text);}
+.macro-grams{color:var(--muted);}
+.macro-bar-bg{height:6px;background:var(--faint);border-radius:3px;overflow:hidden;}
+.macro-bar-fill{height:100%;border-radius:3px;transition:width .6s ease;}
+
+/* FOOD CARD */
+.food-card{display:flex;flex-direction:column;gap:0;}
+.food-intro{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+.food-section{margin-bottom:16px;}
+.food-section-title{
+  font-size:11px;font-weight:500;
+  text-transform:uppercase;letter-spacing:.08em;
+  margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.food-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.food-list{display:flex;flex-wrap:wrap;gap:6px;}
+.food-chip{
+  padding:5px 12px;
+  border-radius:20px;
+  font-size:12px;font-weight:500;
+  border:1px solid;
+  transition:all .2s;
+}
+.food-chip:hover{filter:brightness(1.15);}
+
+/* Chip colors */
+.chip-protein{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);color:var(--accent);}
+.chip-carb{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3);color:var(--yellow);}
+.chip-fat{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.3);color:var(--green);}
+.chip-highlight{animation:chipPop .4s ease;}
+@keyframes chipPop{0%{transform:scale(1)}50%{transform:scale(1.08)}100%{transform:scale(1)}}
+
+.food-tip{
+  margin-top:auto;
+  padding:12px 14px;
+  background:rgba(56,189,248,.06);
+  border:1px solid rgba(56,189,248,.15);
+  border-radius:10px;
+  font-size:12px;color:var(--accent);
+  line-height:1.6;
+}
+.food-tip b{color:var(--text);}
+
+/* GUMROAD BANNERS */
+.gumroad-banner{
+  max-width:960px;margin:0 auto 30px;
+  padding:0 20px;
+  position:relative;z-index:1;
+}
+.gum-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media(max-width:600px){.gum-grid{grid-template-columns:1fr;}}
+.gum-inner{
+  background:linear-gradient(135deg,#0d1a2e,#131f35);
+  border:1px solid rgba(129,140,248,.3);
+  border-radius:18px;
+  padding:22px 24px;
+  display:flex;flex-direction:column;
+  gap:14px;
+  height:100%;
+}
+.gum-inner.hardcore{
+  border-color:rgba(244,114,182,.35);
+  background:linear-gradient(135deg,#1a0d1e,#200d28);
+}
+.gum-top{display:flex;align-items:flex-start;gap:14px;}
+.gum-icon{
+  width:48px;height:48px;min-width:48px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.gum-inner.hardcore .gum-icon{
+  background:linear-gradient(135deg,#f472b6,#e879f9);
+}
+.gum-text{flex:1;}
+.gum-text h3{
+  font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:700;
+  margin-bottom:4px;
+  background:linear-gradient(90deg,#f0f4ff,var(--accent2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.gum-inner.hardcore .gum-text h3{
+  background:linear-gradient(90deg,#f0f4ff,#f472b6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.gum-text p{font-size:12px;color:var(--muted);line-height:1.5;}
+.gum-badge{
+  font-size:10px;font-weight:600;
+  background:rgba(129,140,248,.15);
+  border:1px solid rgba(129,140,248,.3);
+  color:var(--accent2);
+  padding:3px 10px;border-radius:20px;
+  display:inline-block;margin-bottom:6px;
+}
+.gum-badge.red{
+  background:rgba(244,114,182,.12);
+  border-color:rgba(244,114,182,.3);
+  color:#f472b6;
+}
+.gum-features{
+  display:flex;flex-wrap:wrap;gap:6px;
+  padding-top:4px;
+  border-top:1px solid var(--border);
+}
+.gum-feat{
+  font-size:11px;color:var(--muted);
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:3px 9px;border-radius:20px;
+}
+.gum-btn{
+  width:100%;padding:11px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:10px;
+  color:white;
+  font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:700;
+  cursor:pointer;
+  text-decoration:none;
+  display:block;text-align:center;
+  white-space:nowrap;
+  transition:opacity .2s,transform .15s;
+  margin-top:auto;
+}
+.gum-inner.hardcore .gum-btn{
+  background:linear-gradient(135deg,#f472b6,#e879f9);
+}
+.gum-btn:hover{opacity:.9;transform:translateY(-1px);}
+
+/* FEEDBACK */
+.feedback-wrap{
+  max-width:600px;margin:0 auto;
+  padding:40px 20px;
+  position:relative;z-index:1;
+}
+.feedback-wrap h2{
+  font-family:'Syne',sans-serif;
+  font-size:26px;font-weight:800;
+  margin-bottom:8px;
+}
+.feedback-wrap p{font-size:14px;color:var(--muted);margin-bottom:24px;}
+.feedback-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:28px;
+}
+.star-row{display:flex;gap:8px;margin-bottom:20px;}
+.star{font-size:28px;cursor:pointer;opacity:.35;transition:opacity .15s,transform .15s;}
+.star.active,.star:hover{opacity:1;transform:scale(1.15);}
+.fb-field{margin-bottom:16px;}
+.fb-field label{display:block;font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.fb-field input,.fb-field textarea{
+  width:100%;padding:11px 14px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:14px;
+  outline:none;resize:vertical;
+  transition:border-color .2s;
+}
+.fb-field input:focus,.fb-field textarea:focus{border-color:var(--accent);}
+.fb-submit{
+  width:100%;padding:13px;border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;font-family:'Syne',sans-serif;
+  font-size:15px;font-weight:700;cursor:pointer;
+  transition:opacity .2s;
+}
+.fb-submit:hover{opacity:.9;}
+.fb-success{
+  text-align:center;padding:30px;display:none;
+}
+.fb-success .big{font-size:48px;margin-bottom:10px;}
+.fb-success p{color:var(--muted);font-size:14px;}
+
+/* ABOUT / PRIVACY */
+.text-page{
+  max-width:680px;margin:0 auto;
+  padding:40px 20px 60px;
+  position:relative;z-index:1;
+}
+.text-page h1{
+  font-family:'Syne',sans-serif;
+  font-size:32px;font-weight:800;
   margin-bottom:10px;
+  background:linear-gradient(135deg,var(--text),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.text-page .updated{font-size:12px;color:var(--muted);margin-bottom:30px;}
+.text-page h2{
+  font-family:'Syne',sans-serif;
+  font-size:18px;font-weight:700;
+  margin:28px 0 10px;color:var(--text);
+}
+.text-page p{font-size:14px;color:var(--muted);line-height:1.8;margin-bottom:10px;}
+.text-page ul{
+  padding-left:20px;
+  font-size:14px;color:var(--muted);
+  line-height:1.8;
+}
+.text-page a{color:var(--accent);}
+.about-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:20px;margin-top:20px;
+}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);
+  padding:20px;text-align:center;
+  font-size:12px;color:var(--muted);
+  position:relative;z-index:1;
+}
+footer a{color:var(--accent);text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+
+/* AD SLOT */
+.ad-slot{
+  max-width:960px;margin:0 auto 20px;
+  padding:0 20px;text-align:center;
+  position:relative;z-index:1;
+}
+.ad-placeholder{
+  background:var(--card);border:1px dashed var(--border);
+  border-radius:10px;padding:14px;
+  font-size:11px;color:var(--faint);
+  min-height:90px;display:flex;
+  align-items:center;justify-content:center;
 }
 </style>
 </head>
-
 <body>
 
 <nav>
-  <button onclick="show('calc')">Calculator</button>
+  <div class="nav-logo">Calorie Calculator</div>
+  <div class="nav-links">
+    <button class="active" onclick="showPage('calculator',this)">Calculator</button>
+    <button onclick="showPage('feedback',this)">Feedback</button>
+    <button onclick="showPage('about',this)">About</button>
+    <button onclick="showPage('privacy',this)">Privacy</button>
+  </div>
 </nav>
 
-<div id="calc">
+<!-- ========== CALCULATOR ========== -->
+<div id="page-calculator" class="page active">
 
-<div class="container">
-
-  <!-- LEFT -->
-  <div class="left">
-
-    <h2>🔥 Calorie Calculator</h2>
-
-    <input id="age" placeholder="Age">
-    <input id="weight" placeholder="Weight (kg)">
-    <input id="height" placeholder="Height (cm)">
-
-    <select id="activity">
-      <option value="1.2">Sedentary</option>
-      <option value="1.55">Moderate</option>
-      <option value="1.725">Very active</option>
-    </select>
-
-    <select id="goal">
-      <option value="0">Maintain</option>
-      <option value="-500">Lose</option>
-      <option value="300">Gain</option>
-    </select>
-
-    <button class="calc" onclick="calc()">Calculate</button>
-
-    <div id="result"></div>
-
+  <div class="hero">
+    <h1>Free Calorie Calculator.<br/>Know Your Numbers.</h1>
+    <p>Calculate your daily calorie needs, macro split, and get personalized food recommendations — all free.</p>
   </div>
 
-  <!-- RIGHT -->
-  <div class="right">
-    <h3>🍽 Foods to eat</h3>
+  <!-- AD SLOT TOP -->
+  <div class="ad-slot">
+    <!-- Replace with AdSense tag -->
+    <div class="ad-placeholder">Advertisement</div>
+  </div>
 
-    <b>Protein</b>
-    <p class="food">Chicken breast</p>
-    <p class="food">Eggs</p>
-    <p class="food">Greek yogurt</p>
-    <p class="food">Tuna</p>
+  <div class="main-grid">
 
-    <br>
+    <!-- CALCULATOR -->
+    <div class="calc-card">
+      <h2>⚡ Your Stats</h2>
 
-    <b>Carbs</b>
-    <p class="food">Rice</p>
-    <p class="food">Oats</p>
-    <p class="food">Potatoes</p>
-    <p class="food">Bananas</p>
+      <div class="sex-toggle">
+        <button class="sex-btn active" id="btn-male" onclick="setSex('male')">♂ Male</button>
+        <button class="sex-btn" id="btn-female" onclick="setSex('female')">♀ Female</button>
+      </div>
 
-    <br>
+      <div class="field">
+        <label>Age</label>
+        <input id="age" type="number" placeholder="e.g. 28" min="15" max="80"/>
+      </div>
+      <div class="field">
+        <label>Weight (kg)</label>
+        <input id="weight" type="number" placeholder="e.g. 75" min="30" max="300"/>
+      </div>
+      <div class="field">
+        <label>Height (cm)</label>
+        <input id="height" type="number" placeholder="e.g. 175" min="100" max="250"/>
+      </div>
+      <div class="field">
+        <label>Activity Level</label>
+        <select id="activity">
+          <option value="1.2">🛋 Sedentary (desk job, no exercise)</option>
+          <option value="1.375">🚶 Lightly active (1–3 days/week)</option>
+          <option value="1.55" selected>🏃 Moderately active (3–5 days/week)</option>
+          <option value="1.725">💪 Very active (6–7 days/week)</option>
+          <option value="1.9">🔥 Athlete (2× daily training)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Goal</label>
+        <select id="goal">
+          <option value="maintain">⚖ Maintain weight</option>
+          <option value="lose_mild">📉 Lose weight — mild (−0.25 kg/wk)</option>
+          <option value="lose">📉 Lose weight — moderate (−0.5 kg/wk)</option>
+          <option value="lose_fast">📉 Lose weight — aggressive (−1 kg/wk)</option>
+          <option value="gain">📈 Gain muscle (lean bulk +0.25 kg/wk)</option>
+        </select>
+      </div>
 
-    <b>Fats</b>
-    <p class="food">Olive oil</p>
-    <p class="food">Avocado</p>
-    <p class="food">Nuts</p>
-    <p class="food">Peanut butter</p>
+      <button class="calc-btn" onclick="calculate()">Calculate My Calories →</button>
+
+      <div class="result-box" id="result-box">
+        <div class="result-main">
+          <div class="result-kcal" id="res-kcal">—</div>
+          <div class="result-label" id="res-goal-label">kcal / day</div>
+        </div>
+        <div class="result-row"><span>BMR (base rate)</span><b id="res-bmr">—</b></div>
+        <div class="result-row"><span>Maintenance (TDEE)</span><b id="res-tdee">—</b></div>
+        <div class="result-row"><span>Deficit / Surplus</span><b id="res-delta">—</b></div>
+
+        <div class="macro-section">
+          <div class="macro-title">Macro Breakdown</div>
+          <div class="macro-item">
+            <div class="macro-header">
+              <span class="macro-name" style="color:var(--accent)">Protein</span>
+              <span class="macro-grams" id="macro-p-g">— g</span>
+            </div>
+            <div class="macro-bar-bg">
+              <div class="macro-bar-fill" id="bar-p" style="background:var(--accent);width:0%"></div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-header">
+              <span class="macro-name" style="color:var(--yellow)">Carbs</span>
+              <span class="macro-grams" id="macro-c-g">— g</span>
+            </div>
+            <div class="macro-bar-bg">
+              <div class="macro-bar-fill" id="bar-c" style="background:var(--yellow);width:0%"></div>
+            </div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-header">
+              <span class="macro-name" style="color:var(--green)">Fat</span>
+              <span class="macro-grams" id="macro-f-g">— g</span>
+            </div>
+            <div class="macro-bar-bg">
+              <div class="macro-bar-fill" id="bar-f" style="background:var(--green);width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOD CARD -->
+    <div class="food-card" id="food-card">
+      <h2>🍽 What to Eat</h2>
+      <p class="food-intro" id="food-intro">Fill in your stats and calculate to get personalized food recommendations based on your goal.</p>
+      <div id="food-content">
+        <!-- Default foods shown before calculation -->
+        <div class="food-section">
+          <div class="food-section-title"><div class="food-dot" style="background:var(--accent)"></div><span style="color:var(--accent)">Protein</span></div>
+          <div class="food-list">
+            <span class="food-chip chip-protein">Chicken breast</span>
+            <span class="food-chip chip-protein">Eggs</span>
+            <span class="food-chip chip-protein">Greek yogurt</span>
+            <span class="food-chip chip-protein">Tuna</span>
+            <span class="food-chip chip-protein">Cottage cheese</span>
+          </div>
+        </div>
+        <div class="food-section">
+          <div class="food-section-title"><div class="food-dot" style="background:var(--yellow)"></div><span style="color:var(--yellow)">Carbs</span></div>
+          <div class="food-list">
+            <span class="food-chip chip-carb">Rice</span>
+            <span class="food-chip chip-carb">Oats</span>
+            <span class="food-chip chip-carb">Potatoes</span>
+            <span class="food-chip chip-carb">Bananas</span>
+            <span class="food-chip chip-carb">Whole wheat bread</span>
+          </div>
+        </div>
+        <div class="food-section">
+          <div class="food-section-title"><div class="food-dot" style="background:var(--green)"></div><span style="color:var(--green)">Fats</span></div>
+          <div class="food-list">
+            <span class="food-chip chip-fat">Avocado</span>
+            <span class="food-chip chip-fat">Olive oil</span>
+            <span class="food-chip chip-fat">Almonds</span>
+            <span class="food-chip chip-fat">Peanut butter</span>
+            <span class="food-chip chip-fat">Salmon</span>
+          </div>
+        </div>
+      </div>
+      <div class="food-tip" id="food-tip">
+        <b>💡 Tip:</b> Enter your stats and calculate to unlock your personalized food plan and daily tips.
+      </div>
+    </div>
+  </div>
+
+  <!-- GUMROAD BANNERS -->
+  <div class="gumroad-banner">
+    <div style="font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">📘 30-Day Discipline Reset — Choose Your Level</div>
+    <div class="gum-grid">
+
+      <!-- HARDCORE -->
+      <div class="gum-inner hardcore">
+        <div class="gum-top">
+          <div class="gum-icon">🔥</div>
+          <div class="gum-text">
+            <span class="gum-badge red">⚡ HARDCORE</span>
+            <h3>30 Day Discipline Reset — Hardcore Edition</h3>
+            <p>For people who are serious. No excuses. Strict daily targets, cold habits, and zero tolerance for slip-ups. Built for those ready to push their limits.</p>
+          </div>
+        </div>
+        <div class="gum-features">
+          <span class="gum-feat">🧊 Cold habits</span>
+          <span class="gum-feat">⏱ Strict timers</span>
+          <span class="gum-feat">📵 No-phone rules</span>
+          <span class="gum-feat">🏋️ Daily training</span>
+          <span class="gum-feat">📓 Notes + ticks</span>
+        </div>
+        <a href="https://netheritestar.gumroad.com/l/cyuwsh" target="_blank" rel="noopener" class="gum-btn">Get Hardcore Edition →</a>
+      </div>
+
+      <!-- BEGINNER -->
+      <div class="gum-inner">
+        <div class="gum-top">
+          <div class="gum-icon">🌱</div>
+          <div class="gum-text">
+            <span class="gum-badge">✦ BEGINNER FRIENDLY</span>
+            <h3>30 Day Discipline Reset — Starter Edition</h3>
+            <p>New to building habits? This is your entry point. Gentle daily tick boxes, encouraging prompts, and realistic goals to get momentum going from day one.</p>
+          </div>
+        </div>
+        <div class="gum-features">
+          <span class="gum-feat">✅ Simple tick boxes</span>
+          <span class="gum-feat">💬 Daily prompts</span>
+          <span class="gum-feat">📝 Notes section</span>
+          <span class="gum-feat">🎯 Easy wins</span>
+          <span class="gum-feat">📅 30 day pages</span>
+        </div>
+        <a href="https://netheritestar.gumroad.com/l/nurkys" target="_blank" rel="noopener" class="gum-btn">Get Starter Edition →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- AD SLOT BOTTOM -->
+  <div class="ad-slot">
+    <!-- Replace with AdSense tag -->
+    <div class="ad-placeholder">Advertisement</div>
   </div>
 
 </div>
 
+<!-- ========== FEEDBACK ========== -->
+<div id="page-feedback" class="page">
+  <div class="feedback-wrap">
+    <h2>💬 Share Your Feedback</h2>
+    <p>Love it? Found a bug? Have a feature idea? Tell us — it takes 30 seconds and we read every submission.</p>
+    <div class="feedback-card">
+      <div id="fb-form">
+        <div style="margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Rate your experience</div>
+          <div class="star-row" id="stars">
+            <span class="star" onclick="setStars(1)">★</span>
+            <span class="star" onclick="setStars(2)">★</span>
+            <span class="star" onclick="setStars(3)">★</span>
+            <span class="star" onclick="setStars(4)">★</span>
+            <span class="star" onclick="setStars(5)">★</span>
+          </div>
+        </div>
+        <div class="fb-field">
+          <label>Name (optional)</label>
+          <input id="fb-name" placeholder="e.g. Alex"/>
+        </div>
+        <div class="fb-field">
+          <label>Your message</label>
+          <textarea id="fb-msg" rows="4" placeholder="What do you think? Any bugs or suggestions?"></textarea>
+        </div>
+        <button class="fb-submit" onclick="submitFeedback()">Send Feedback ✉</button>
+      </div>
+      <div class="fb-success" id="fb-success">
+        <div class="big">🎉</div>
+        <h3 style="font-family:'Syne',sans-serif;margin-bottom:8px;">Thanks so much!</h3>
+        <p>Your feedback has been noted. We'll use it to make Calorie Calculator even better.</p>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- ========== ABOUT ========== -->
+<div id="page-about" class="page">
+  <div class="text-page">
+    <h1>About Calorie Calculator</h1>
+    <div class="updated">Built with ❤️ for anyone serious about their health</div>
+
+    <div class="about-card">
+      <p style="font-size:15px;color:var(--text);line-height:1.8;">
+        Calorie Calculator is a free, no-signup calorie and macro calculator designed for people who want clear, science-backed answers — without the clutter of apps that require creating accounts.
+      </p>
+    </div>
+
+    <h2>How it works</h2>
+    <p>We use the <b style="color:var(--text)">Mifflin–St Jeor equation</b> — the most validated BMR formula for modern adults — combined with standard activity multipliers to estimate your Total Daily Energy Expenditure (TDEE). Your calorie target is then adjusted based on your goal.</p>
+    <p>Macro splits are goal-specific: higher protein is recommended during a calorie deficit to preserve muscle mass, while moderate splits are used for maintenance and lean bulking phases.</p>
+
+    <h2>Our mission</h2>
+    <p>Nutrition tracking doesn't need to be complicated. This calculator gives you the numbers you need in under 30 seconds. No required accounts, no subscriptions — just useful information.</p>
+
+    <h2>The 30 Day Discipline Reset PDFs</h2>
+    <p>Want to build habits that actually stick? We offer two versions of our 30 Day Discipline Reset PDF — both with daily habit tick boxes, a notes section for each day, and reflection prompts:</p>
+    <ul style="margin:8px 0 8px 20px;">
+      <li style="margin-bottom:6px;"><a href="https://netheritestar.gumroad.com/l/cyuwsh" target="_blank" rel="noopener">Hardcore Edition</a> — strict daily habits, cold discipline, no excuses. For people ready to go all in.</li>
+      <li><a href="https://netheritestar.gumroad.com/l/nurkys" target="_blank" rel="noopener">Starter Edition</a> — beginner-friendly, gentle prompts, easy wins to build momentum from day one.</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <p>Questions or feedback? Use the <a href="#" onclick="showPage('feedback',null);return false;">Feedback</a> page — we read every message.</p>
+  </div>
+</div>
+
+<!-- ========== PRIVACY POLICY ========== -->
+<div id="page-privacy" class="page">
+  <div class="text-page">
+    <h1>Privacy Policy</h1>
+    <div class="updated">Last updated: June 2025</div>
+
+    <p>Calorie Calculator ("we", "us", or "our") operates this website. This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our service.</p>
+
+    <h2>Information We Collect</h2>
+    <p>Calorie Calculator does not require you to create an account or log in. The calculator operates entirely in your browser. <b style="color:var(--text)">We do not store any health data you enter</b> (age, weight, height, etc.) on our servers.</p>
+    <p>We may collect the following non-personal data automatically:</p>
+    <ul>
+      <li>Browser type and version</li>
+      <li>Pages visited and time spent (via analytics)</li>
+      <li>Referring URLs</li>
+      <li>Country-level location data</li>
+    </ul>
+
+    <h2>Cookies</h2>
+    <p>We use cookies and similar tracking technologies to track activity on our site. This may include third-party cookies set by advertising partners (Google AdSense) and analytics providers (Google Analytics). You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.</p>
+
+    <h2>Google AdSense</h2>
+    <p>We use Google AdSense to display advertisements. Google may use cookies to serve ads based on your prior visits to this website or other websites. You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener">Google Ads Settings</a>.</p>
+
+    <h2>Third-Party Links</h2>
+    <p>Our site contains links to external websites (including our Gumroad product page). We have no control over the content and privacy practices of those sites and are not responsible for them.</p>
+
+    <h2>Feedback Submissions</h2>
+    <p>If you submit feedback via our feedback form, your message and optional name may be stored for internal review purposes. We do not share this data with third parties.</p>
+
+    <h2>Children's Privacy</h2>
+    <p>Our service is not directed to children under the age of 13. We do not knowingly collect personally identifiable information from children under 13.</p>
+
+    <h2>Changes to This Policy</h2>
+    <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new policy on this page with an updated date.</p>
+
+    <h2>Contact Us</h2>
+    <p>If you have any questions about this Privacy Policy, please use our <a href="#" onclick="showPage('feedback',null);return false;">Feedback page</a>.</p>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 Calorie Calculator · <a href="#" onclick="showPage('privacy',null);return false;">Privacy Policy</a> · <a href="#" onclick="showPage('about',null);return false;">About</a> · <a href="https://netheritestar.gumroad.com/l/cyuwsh" target="_blank" rel="noopener">Hardcore PDF</a> · <a href="https://netheritestar.gumroad.com/l/nurkys" target="_blank" rel="noopener">Starter PDF</a></p>
+  <p style="margin-top:6px;">Calorie estimates use the Mifflin–St Jeor equation. For medical advice, consult a healthcare professional.</p>
+</footer>
 
 <script>
-function show(){
-  // only 1 page, safe
+/* ===== NAV ===== */
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-links button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function calc(){
+/* ===== SEX TOGGLE ===== */
+let sex = 'male';
+function setSex(s){
+  sex = s;
+  document.getElementById('btn-male').classList.toggle('active', s==='male');
+  document.getElementById('btn-female').classList.toggle('active', s==='female');
+}
 
-  const age = Number(document.getElementById("age").value);
-  const weight = Number(document.getElementById("weight").value);
-  const height = Number(document.getElementById("height").value);
-  const activity = Number(document.getElementById("activity").value);
-  const goal = Number(document.getElementById("goal").value);
+/* ===== FOOD DATA ===== */
+const foodData = {
+  maintain:{
+    protein:['Chicken breast','Eggs','Greek yogurt','Tuna','Cottage cheese','Turkey','Tofu'],
+    carb:['Brown rice','Oats','Sweet potato','Quinoa','Whole wheat pasta','Bananas','Lentils'],
+    fat:['Avocado','Olive oil','Almonds','Peanut butter','Salmon','Walnuts','Chia seeds'],
+    tip:'<b>⚖ Maintenance goal:</b> Prioritize balanced meals with all three macros. Meal prep 2–3 days ahead to hit your target consistently.',
+    intro:'Your goal is maintenance — keep macros balanced and consistent across the week.'
+  },
+  lose:{
+    protein:['Chicken breast','Egg whites','Low-fat Greek yogurt','White fish','Shrimp','Turkey mince','Protein powder'],
+    carb:['Leafy greens','Broccoli','Cauliflower','Berries','Apples','Oats','Sweet potato'],
+    fat:['Avocado (½)','Olive oil (1 tbsp)','Almonds (small handful)','Salmon','Flaxseeds'],
+    tip:'<b>📉 Cutting tip:</b> Eating high-volume, low-calorie foods (vegetables, lean protein) keeps you full. Aim for <b>protein at every meal</b> to protect muscle.',
+    intro:'Cutting calories? Fill your plate with lean protein and fibrous vegetables to stay full and preserve muscle.'
+  },
+  gain:{
+    protein:['Chicken thighs','Whole eggs','Greek yogurt','Beef mince','Salmon','Cottage cheese','Milk'],
+    carb:['White rice','Pasta','Oats','Potatoes','Bananas','Bread','Dates'],
+    fat:['Whole eggs','Peanut butter','Avocado','Full-fat dairy','Olive oil','Mixed nuts','Dark chocolate'],
+    tip:'<b>📈 Bulking tip:</b> Struggle to eat enough? Add calorie-dense foods like nut butters, olive oil drizzles, and full-fat dairy to meals without much extra volume.',
+    intro:'Building muscle? You need a calorie surplus with plenty of protein and energy-dense carbs and fats.'
+  }
+};
 
-  if(!age || !weight || !height){
-    alert("Fill all fields");
+/* ===== CALCULATE ===== */
+function calculate(){
+  const age    = parseFloat(document.getElementById('age').value);
+  const weight = parseFloat(document.getElementById('weight').value);
+  const height = parseFloat(document.getElementById('height').value);
+  const activity = parseFloat(document.getElementById('activity').value);
+  const goal   = document.getElementById('goal').value;
+
+  if(!age||!weight||!height||age<15||age>80||weight<30||height<100){
+    alert('Please fill in all fields with valid values.');
     return;
   }
 
-  const bmr = 10*weight + 6.25*height - 5*age + 5;
-  const tdee = bmr * activity;
-  const target = tdee + goal;
+  /* BMR — Mifflin–St Jeor */
+  let bmr = sex==='male'
+    ? 10*weight + 6.25*height - 5*age + 5
+    : 10*weight + 6.25*height - 5*age - 161;
 
-  document.getElementById("result").innerHTML = `
-    <div class="result">
-      <h3>Results</h3>
-      <p>Calories: <b>${Math.round(target)}</b></p>
-      <p>BMR: <b>${Math.round(bmr)}</b></p>
-      <p>TDEE: <b>${Math.round(tdee)}</b></p>
-    </div>
-  `;
+  const tdee   = bmr * activity;
+
+  const deficits = {
+    maintain:0, lose_mild:-275, lose:-500, lose_fast:-1000, gain:275
+  };
+  const deficit = deficits[goal];
+  const target  = tdee + deficit;
+
+  /* Macros */
+  const protPct = goal.includes('lose') ? 0.35 : goal==='gain' ? 0.30 : 0.30;
+  const fatPct  = 0.28;
+  const carbPct = 1 - protPct - fatPct;
+
+  const protKcal = target * protPct;
+  const carbKcal = target * carbPct;
+  const fatKcal  = target * fatPct;
+
+  const protG = Math.round(protKcal/4);
+  const carbG = Math.round(carbKcal/4);
+  const fatG  = Math.round(fatKcal/9);
+
+  /* Goal labels */
+  const goalLabels = {
+    maintain:'Maintain weight',
+    lose_mild:'Lose ~0.25 kg/week',
+    lose:'Lose ~0.5 kg/week',
+    lose_fast:'Lose ~1 kg/week',
+    gain:'Gain ~0.25 kg/week'
+  };
+
+  const deltaText = deficit===0 ? '0 kcal' : (deficit>0?'+':'')+deficit+' kcal';
+
+  /* Update UI */
+  document.getElementById('res-kcal').textContent    = Math.round(target);
+  document.getElementById('res-goal-label').textContent = 'kcal/day · '+goalLabels[goal];
+  document.getElementById('res-bmr').textContent     = Math.round(bmr)+' kcal';
+  document.getElementById('res-tdee').textContent    = Math.round(tdee)+' kcal';
+  document.getElementById('res-delta').textContent   = deltaText;
+  document.getElementById('macro-p-g').textContent   = protG+' g ('+Math.round(protPct*100)+'%)';
+  document.getElementById('macro-c-g').textContent   = carbG+' g ('+Math.round(carbPct*100)+'%)';
+  document.getElementById('macro-f-g').textContent   = fatG+' g ('+Math.round(fatPct*100)+'%)';
+
+  setTimeout(()=>{
+    document.getElementById('bar-p').style.width = Math.round(protPct*100)+'%';
+    document.getElementById('bar-c').style.width = Math.round(carbPct*100)+'%';
+    document.getElementById('bar-f').style.width = Math.round(fatPct*100)+'%';
+  },50);
+
+  document.getElementById('result-box').classList.add('show');
+
+  /* Dynamic food recommendations */
+  const cat = goal==='gain' ? 'gain' : goal.includes('lose') ? 'lose' : 'maintain';
+  const fd  = foodData[cat];
+
+  document.getElementById('food-intro').textContent = fd.intro;
+  document.getElementById('food-tip').innerHTML     = '💡 '+fd.tip;
+
+  document.getElementById('food-content').innerHTML =
+    renderSection('Protein','var(--accent)','chip-protein',fd.protein)+
+    renderSection('Carbs','var(--yellow)','chip-carb',fd.carb)+
+    renderSection('Fats','var(--green)','chip-fat',fd.fat);
+}
+
+function renderSection(label, color, cls, items){
+  const chips = items.map((f,i)=>`<span class="food-chip ${cls} chip-highlight" style="animation-delay:${i*0.05}s">${f}</span>`).join('');
+  return `
+    <div class="food-section">
+      <div class="food-section-title">
+        <div class="food-dot" style="background:${color}"></div>
+        <span style="color:${color}">${label}</span>
+      </div>
+      <div class="food-list">${chips}</div>
+    </div>`;
+}
+
+/* ===== FEEDBACK ===== */
+let starRating = 0;
+function setStars(n){
+  starRating = n;
+  document.querySelectorAll('.star').forEach((s,i)=>{
+    s.classList.toggle('active', i<n);
+  });
+}
+function submitFeedback(){
+  const msg = document.getElementById('fb-msg').value.trim();
+  if(!msg){alert('Please write a message before sending.');return;}
+  document.getElementById('fb-form').style.display='none';
+  document.getElementById('fb-success').style.display='block';
 }
 </script>
-
 </body>
 </html>
