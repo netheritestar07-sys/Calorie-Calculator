@@ -6,27 +6,24 @@
 <title>Calorie Calculator</title>
 
 <meta name="google-site-verification" content="Nm3RVs0oPIOKXxBzIegKvGQlDoilSoAxvTxujh0ebrk" />
-<meta name="description" content="Free calorie calculator to estimate TDEE, BMR, and macros for weight loss, maintenance, and muscle gain." />
+<meta name="description" content="Free calorie calculator to estimate TDEE, BMR, and macros." />
 
 <style>
-:root {
-  --bg1:#0b1220;
-  --bg2:#0f1a33;
+:root{
+  --bg:#0b1220;
   --card:rgba(255,255,255,0.06);
   --border:rgba(255,255,255,0.08);
-  --text:#f8fafc;
+  --text:#ffffff;
   --muted:#aab4c5;
   --accent:#60a5fa;
-  --accent2:#a855f7;
-  --radius:16px;
-  --font: ui-sans-serif, system-ui;
+  --radius:14px;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-  font-family:var(--font);
-  background: radial-gradient(circle at top, #1e3a8a, #0b1220 40%, #050814);
+  font-family:system-ui;
+  background:var(--bg);
   color:var(--text);
 }
 
@@ -34,9 +31,8 @@ body{
 nav{
   display:flex;
   justify-content:center;
-  gap:20px;
-  padding:18px;
-  backdrop-filter: blur(10px);
+  gap:15px;
+  padding:15px;
 }
 
 nav button{
@@ -44,194 +40,217 @@ nav button{
   border:none;
   color:var(--muted);
   cursor:pointer;
-  font-size:14px;
 }
+nav button:hover{color:#fff;}
 
-nav button:hover{color:white;}
-
-/* PAGE */
 .page{
   display:none;
-  max-width:720px;
+  max-width:900px;
   margin:auto;
   padding:20px;
 }
-
 .page.active{display:block;}
 
-/* TITLE */
-h1{
-  font-size:28px;
-  margin-bottom:6px;
+/* LAYOUT */
+.container{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
 }
 
-p.sub{
-  color:var(--muted);
-  margin-bottom:20px;
+/* LEFT */
+.left{
+  flex:1;
+  min-width:300px;
+}
+
+/* RIGHT FOOD PANEL */
+.right{
+  flex:1;
+  min-width:260px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:15px;
 }
 
 /* INPUTS */
 input,select{
   width:100%;
-  padding:12px;
+  padding:10px;
   margin-top:10px;
-  border-radius:12px;
+  border-radius:10px;
   border:1px solid var(--border);
-  background:rgba(255,255,255,0.04);
+  background:#111c2e;
   color:white;
-  outline:none;
 }
 
 input:focus,select:focus{
+  outline:none;
   border-color:var(--accent);
-  box-shadow:0 0 0 3px rgba(96,165,250,0.15);
 }
 
 /* BUTTON */
 button.calc{
-  margin-top:14px;
   width:100%;
+  margin-top:12px;
   padding:12px;
   border:none;
   border-radius:12px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  background:linear-gradient(135deg,#60a5fa,#7c3aed);
   color:white;
   font-weight:bold;
   cursor:pointer;
-  transition:0.2s;
 }
 
-button.calc:hover{
-  transform:translateY(-2px);
-}
-
-/* CARD */
-.card{
-  margin-top:18px;
-  padding:16px;
+/* RESULT */
+.result{
+  margin-top:15px;
+  padding:15px;
   border-radius:var(--radius);
-  background:var(--card);
+  background:#111c2e;   /* FIX: no more white */
   border:1px solid var(--border);
-  backdrop-filter: blur(10px);
 }
 
-.card h3{
-  margin-bottom:10px;
-}
+/* FOOD LIST */
+h3{margin-bottom:10px;}
 
-.card p{
+.food{
+  font-size:13px;
   color:var(--muted);
   margin:4px 0;
 }
 
-/* GRID RESULT */
-.result-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
+.section{
+  margin-bottom:15px;
 }
 
-/* GUMROAD */
-.gumroad{
-  margin-top:25px;
-  padding:16px;
-  border-radius:var(--radius);
-  background:linear-gradient(135deg, rgba(96,165,250,0.15), rgba(168,85,247,0.15));
-  border:1px solid var(--border);
-}
-
-.gumroad a{
-  color:var(--accent);
-  font-weight:bold;
-  text-decoration:none;
-}
-
-.gumroad a:hover{text-decoration:underline;}
 </style>
 </head>
 
 <body>
 
 <nav>
-  <button onclick="showPage('calc')">Calculator</button>
-  <button onclick="showPage('about')">About</button>
-  <button onclick="showPage('privacy')">Privacy</button>
+  <button onclick="show('calc')">Calculator</button>
+  <button onclick="show('about')">About</button>
+  <button onclick="show('privacy')">Privacy</button>
 </nav>
 
 <!-- CALC -->
 <div id="calc" class="page active">
-  <h1>🔥 Calorie Calculator</h1>
-  <p class="sub">Find your calories, macros, and body needs in seconds.</p>
 
-  <input id="age" placeholder="Age">
-  <input id="weight" placeholder="Weight (kg)">
-  <input id="height" placeholder="Height (cm)">
+<div class="container">
 
-  <select id="activity">
-    <option value="1.2">Sedentary</option>
-    <option value="1.55">Moderate</option>
-    <option value="1.725">Very active</option>
-  </select>
+  <!-- LEFT -->
+  <div class="left">
 
-  <select id="goal">
-    <option value="0">Maintain</option>
-    <option value="-500">Lose fat</option>
-    <option value="300">Gain muscle</option>
-  </select>
+    <h2>🔥 Calorie Calculator</h2>
 
-  <button class="calc" onclick="calc()">Calculate</button>
+    <input id="age" placeholder="Age">
+    <input id="weight" placeholder="Weight (kg)">
+    <input id="height" placeholder="Height (cm)">
 
-  <div id="result"></div>
+    <select id="activity">
+      <option value="1.2">Sedentary</option>
+      <option value="1.55">Moderate</option>
+      <option value="1.725">Very active</option>
+    </select>
 
-  <!-- GUMROAD -->
-  <div class="gumroad">
-    <h3>💪 Bonus Guide</h3>
-    <p>Want faster results? I made a full fitness guide.</p>
-    <a href="https://netheritestar.gumroad.com/l/nurkys" target="_blank">
-      👉 Get it here
-    </a>
+    <select id="goal">
+      <option value="0">Maintain</option>
+      <option value="-500">Lose</option>
+      <option value="300">Gain</option>
+    </select>
+
+    <button class="calc" onclick="calc()">Calculate</button>
+
+    <div id="result"></div>
+
   </div>
+
+  <!-- RIGHT FOOD PANEL -->
+  <div class="right">
+    <h3>🍽 Food suggestions</h3>
+
+    <div class="section">
+      <b>Protein</b>
+      <div id="proteinFood"></div>
+    </div>
+
+    <div class="section">
+      <b>Carbs</b>
+      <div id="carbFood"></div>
+    </div>
+
+    <div class="section">
+      <b>Fats</b>
+      <div id="fatFood"></div>
+    </div>
+  </div>
+
+</div>
 </div>
 
 <!-- ABOUT -->
 <div id="about" class="page">
-  <h1>About</h1>
-  <p class="sub">This calculator uses the Mifflin-St Jeor equation to estimate calorie needs.</p>
+  <h2>About</h2>
+  <p>This tool calculates calories and macros using scientific formulas.</p>
 </div>
 
 <!-- PRIVACY -->
 <div id="privacy" class="page">
-  <h1>Privacy Policy</h1>
-  <p class="sub">We do not collect any personal data. All calculations happen locally in your browser.</p>
+  <h2>Privacy</h2>
+  <p>No data is stored.</p>
 </div>
 
 <script>
-function showPage(id){
+function show(id){
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
 function calc(){
-  const age = +document.getElementById("age").value;
-  const weight = +document.getElementById("weight").value;
-  const height = +document.getElementById("height").value;
-  const activity = +document.getElementById("activity").value;
-  const goal = +document.getElementById("goal").value;
 
-  const bmr = 10*weight + 6.25*height - 5*age + 5;
-  const tdee = bmr * activity;
-  const target = tdee + goal;
+  const age=+age.value;
+  const weight=+document.getElementById("weight").value;
+  const height=+document.getElementById("height").value;
+  const activity=+document.getElementById("activity").value;
+  const goal=+document.getElementById("goal").value;
 
-  document.getElementById("result").innerHTML = `
-    <div class="card">
-      <h3>📊 Your Results</h3>
-      <div class="result-grid">
-        <p>Calories: <b>${Math.round(target)}</b></p>
-        <p>BMR: <b>${Math.round(bmr)}</b></p>
-        <p>TDEE: <b>${Math.round(tdee)}</b></p>
-      </div>
+  const bmr=10*weight+6.25*height-5*age+5;
+  const tdee=bmr*activity;
+  const target=tdee+goal;
+
+  /* FIXED DARK RESULT */
+  document.getElementById("result").innerHTML=`
+    <div class="result">
+      <h3>Results</h3>
+      <p>Calories: <b>${Math.round(target)}</b></p>
+      <p>BMR: <b>${Math.round(bmr)}</b></p>
+      <p>TDEE: <b>${Math.round(tdee)}</b></p>
     </div>
+  `;
+
+  /* FOOD LOGIC */
+  document.getElementById("proteinFood").innerHTML=`
+    <p class="food">Chicken breast</p>
+    <p class="food">Eggs</p>
+    <p class="food">Greek yogurt</p>
+    <p class="food">Tuna</p>
+  `;
+
+  document.getElementById("carbFood").innerHTML=`
+    <p class="food">Rice</p>
+    <p class="food">Oats</p>
+    <p class="food">Potatoes</p>
+    <p class="food">Bananas</p>
+  `;
+
+  document.getElementById("fatFood").innerHTML=`
+    <p class="food">Olive oil</p>
+    <p class="food">Avocado</p>
+    <p class="food">Nuts</p>
+    <p class="food">Peanut butter</p>
   `;
 }
 </script>
