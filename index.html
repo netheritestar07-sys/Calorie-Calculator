@@ -10,93 +10,144 @@
 
 <style>
 :root {
-  --color-background-primary: #0b1220;
-  --color-background-secondary: #111c2e;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-text-tertiary: #94a3b8;
-  --accent: #60a5fa;
-  --border-radius-md: 12px;
-  --font-sans: ui-sans-serif, system-ui;
+  --bg1:#0b1220;
+  --bg2:#0f1a33;
+  --card:rgba(255,255,255,0.06);
+  --border:rgba(255,255,255,0.08);
+  --text:#f8fafc;
+  --muted:#aab4c5;
+  --accent:#60a5fa;
+  --accent2:#a855f7;
+  --radius:16px;
+  --font: ui-sans-serif, system-ui;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
+*{margin:0;padding:0;box-sizing:border-box;}
 
-body {
-  font-family: var(--font-sans);
-  background: #0b1220;
-  color: var(--color-text-primary);
+body{
+  font-family:var(--font);
+  background: radial-gradient(circle at top, #1e3a8a, #0b1220 40%, #050814);
+  color:var(--text);
 }
 
-nav {
+/* NAV */
+nav{
   display:flex;
   justify-content:center;
   gap:20px;
-  padding:15px;
-  border-bottom:1px solid #1a2433;
+  padding:18px;
+  backdrop-filter: blur(10px);
 }
 
-nav button {
+nav button{
   background:none;
   border:none;
-  color:var(--color-text-secondary);
+  color:var(--muted);
   cursor:pointer;
+  font-size:14px;
 }
 
-nav button:hover {
-  color:white;
+nav button:hover{color:white;}
+
+/* PAGE */
+.page{
+  display:none;
+  max-width:720px;
+  margin:auto;
+  padding:20px;
 }
 
-.page { display:none; padding:20px; max-width:700px; margin:auto; }
-.page.active { display:block; }
+.page.active{display:block;}
 
-input, select {
+/* TITLE */
+h1{
+  font-size:28px;
+  margin-bottom:6px;
+}
+
+p.sub{
+  color:var(--muted);
+  margin-bottom:20px;
+}
+
+/* INPUTS */
+input,select{
   width:100%;
-  padding:8px;
-  margin-top:5px;
-  border-radius:8px;
-  border:1px solid #1a2433;
-  background:#111c2e;
-  color:white;
-}
-
-button.calc {
+  padding:12px;
   margin-top:10px;
-  width:100%;
-  padding:10px;
-  background:linear-gradient(135deg,#60a5fa,#3b82f6);
-  border:none;
-  border-radius:10px;
-  color:white;
-  cursor:pointer;
-}
-
-.card {
-  background:#111c2e;
-  padding:15px;
-  border-radius:10px;
-  margin-top:10px;
-}
-
-/* 🔥 Gumroad box */
-.gumroad {
-  margin-top:20px;
-  padding:15px;
-  background:#111c2e;
-  border:1px solid #1a2433;
   border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);
+  color:white;
+  outline:none;
 }
 
-.gumroad a {
-  color:#60a5fa;
+input:focus,select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(96,165,250,0.15);
+}
+
+/* BUTTON */
+button.calc{
+  margin-top:14px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button.calc:hover{
+  transform:translateY(-2px);
+}
+
+/* CARD */
+.card{
+  margin-top:18px;
+  padding:16px;
+  border-radius:var(--radius);
+  background:var(--card);
+  border:1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+
+.card h3{
+  margin-bottom:10px;
+}
+
+.card p{
+  color:var(--muted);
+  margin:4px 0;
+}
+
+/* GRID RESULT */
+.result-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+/* GUMROAD */
+.gumroad{
+  margin-top:25px;
+  padding:16px;
+  border-radius:var(--radius);
+  background:linear-gradient(135deg, rgba(96,165,250,0.15), rgba(168,85,247,0.15));
+  border:1px solid var(--border);
+}
+
+.gumroad a{
+  color:var(--accent);
   font-weight:bold;
   text-decoration:none;
 }
 
-.gumroad a:hover {
-  text-decoration:underline;
-}
-
+.gumroad a:hover{text-decoration:underline;}
 </style>
 </head>
 
@@ -105,13 +156,13 @@ button.calc {
 <nav>
   <button onclick="showPage('calc')">Calculator</button>
   <button onclick="showPage('about')">About</button>
-  <button onclick="showPage('privacy')">Privacy Policy</button>
+  <button onclick="showPage('privacy')">Privacy</button>
 </nav>
 
-<!-- CALCULATOR PAGE -->
+<!-- CALC -->
 <div id="calc" class="page active">
-
-  <h1>Calorie Calculator</h1>
+  <h1>🔥 Calorie Calculator</h1>
+  <p class="sub">Find your calories, macros, and body needs in seconds.</p>
 
   <input id="age" placeholder="Age">
   <input id="weight" placeholder="Weight (kg)">
@@ -125,43 +176,40 @@ button.calc {
 
   <select id="goal">
     <option value="0">Maintain</option>
-    <option value="-500">Lose</option>
-    <option value="300">Gain</option>
+    <option value="-500">Lose fat</option>
+    <option value="300">Gain muscle</option>
   </select>
 
   <button class="calc" onclick="calc()">Calculate</button>
 
   <div id="result"></div>
 
-  <!-- 🔥 YOUR GUMROAD PRODUCT (added cleanly) -->
+  <!-- GUMROAD -->
   <div class="gumroad">
-    <h3>🔥 Bonus Fitness Guide</h3>
-    <p>
-      I also made a full fitness guide to help you lose fat and build muscle faster.
-    </p>
+    <h3>💪 Bonus Guide</h3>
+    <p>Want faster results? I made a full fitness guide.</p>
     <a href="https://netheritestar.gumroad.com/l/nurkys" target="_blank">
       👉 Get it here
     </a>
   </div>
-
 </div>
 
 <!-- ABOUT -->
 <div id="about" class="page">
   <h1>About</h1>
-  <p>This tool helps you calculate daily calories, TDEE, and macros using scientific formulas.</p>
+  <p class="sub">This calculator uses the Mifflin-St Jeor equation to estimate calorie needs.</p>
 </div>
 
 <!-- PRIVACY -->
 <div id="privacy" class="page">
   <h1>Privacy Policy</h1>
-  <p>This website does not collect personal data. All calculations are done locally in your browser.</p>
+  <p class="sub">We do not collect any personal data. All calculations happen locally in your browser.</p>
 </div>
 
 <script>
 function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
 function calc(){
@@ -177,10 +225,12 @@ function calc(){
 
   document.getElementById("result").innerHTML = `
     <div class="card">
-      <h3>Result</h3>
-      <p>Calories: ${Math.round(target)}</p>
-      <p>BMR: ${Math.round(bmr)}</p>
-      <p>TDEE: ${Math.round(tdee)}</p>
+      <h3>📊 Your Results</h3>
+      <div class="result-grid">
+        <p>Calories: <b>${Math.round(target)}</b></p>
+        <p>BMR: <b>${Math.round(bmr)}</b></p>
+        <p>TDEE: <b>${Math.round(tdee)}</b></p>
+      </div>
     </div>
   `;
 }
