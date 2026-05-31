@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://netheritestar.github.io/sitemap.xml
+Sitemap: https://netheritestar07-sys.github.io/Calorie-Calculator/sitemap.xml
